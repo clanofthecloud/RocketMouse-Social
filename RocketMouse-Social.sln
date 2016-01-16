@@ -1,0 +1,23 @@
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2008
+
+Project("{421BCB6F-7DF5-95EC-DB13-7CBBBD88A7BE}") = "RocketMouse-Social", "Assembly-CSharp.csproj", "{7CBDB59B-9961-F0F2-5DC3-379E0C2D0F24}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7CBDB59B-9961-F0F2-5DC3-379E0C2D0F24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7CBDB59B-9961-F0F2-5DC3-379E0C2D0F24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7CBDB59B-9961-F0F2-5DC3-379E0C2D0F24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7CBDB59B-9961-F0F2-5DC3-379E0C2D0F24}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Assembly-CSharp.csproj
+	EndGlobalSection
+EndGlobal
