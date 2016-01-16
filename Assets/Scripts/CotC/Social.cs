@@ -23,6 +23,7 @@ public class Social : MonoBehaviour {
 		Promise.UnhandledException += (object sender, ExceptionEventArgs e) => {
 			Debug.LogError("Unhandled exception: " + e.Exception.ToString());
 		};
+		Promise.Debug_OutputAllExceptions = true;
 
 		// Initiate getting the main Cloud object
 		cotc.GetCloud().Done(cloud => {
@@ -84,13 +85,7 @@ public class Social : MonoBehaviour {
 		Loop.ReceivedEvent += Loop_ReceivedEvent;
 		Debug.Log("Signed in successfully (ID = " + Gamer.GamerId + ")");
 		// Keep login in persistent memory to restore next time
-		Debug.LogWarning(PlayerPrefs.HasKey ("GamerInfo"));
-		try {
 		PlayerPrefs.SetString("GamerInfo", new GamerInfo(Gamer).ToJson());
-		} catch (Exception e) {
-			Debug.LogError (e.ToString ());
-		}
-		Debug.LogWarning(PlayerPrefs.HasKey ("GamerInfo"));
 	}
 
 	private Promise<Gamer> MakeAnonymousAccount() {

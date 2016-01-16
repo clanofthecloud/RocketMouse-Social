@@ -11,6 +11,7 @@ public class GamerInfo
 	}
 
 	public GamerInfo(Gamer gamer) {
+		Data = Bundle.CreateObject ();
 		GamerId = gamer.GamerId;
 		GamerSecret = gamer.GamerSecret;
 	}
