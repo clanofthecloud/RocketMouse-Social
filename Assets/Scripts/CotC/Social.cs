@@ -11,6 +11,8 @@ public class Social : MonoBehaviour {
 	private Gamer Gamer;
 	// When a gamer is logged in, the loop is launched for domain private. Only one is run at once.
 	private DomainEventLoop Loop;
+	// Leaderboards for score (max. number of collected coins) are stored under this name on the server.
+	private static string ScoreBoardName = "scores";
 
 	// Use this for initialization
 	void Start () {
@@ -23,7 +25,7 @@ public class Social : MonoBehaviour {
 		Promise.UnhandledException += (object sender, ExceptionEventArgs e) => {
 			Debug.LogError("Unhandled exception: " + e.Exception.ToString());
 		};
-		Promise.Debug_OutputAllExceptions = true;
+//		Promise.Debug_OutputAllExceptions = true;
 
 		// Initiate getting the main Cloud object
 		cotc.GetCloud().Done(cloud => {
@@ -37,6 +39,7 @@ public class Social : MonoBehaviour {
 				e.UserData = ++count;
 			};
 			Debug.Log("Setup done");
+//			PostSampleScoresForTesting();
 			InitCloud();
 		});
 	}
@@ -57,7 +60,6 @@ public class Social : MonoBehaviour {
 	#region Login stuff
 	private void AutoRelogin() {
 		// On the first time, we need to log in anonymously, else log back with the stored credentials
-		Debug.LogWarning(PlayerPrefs.HasKey ("GamerInfo"));
 		if (!PlayerPrefs.HasKey ("GamerInfo")) {
 			MakeAnonymousAccount ();
 		}
@@ -65,7 +67,10 @@ public class Social : MonoBehaviour {
 			// Log back in
 			GamerInfo info = new GamerInfo(PlayerPrefs.GetString("GamerInfo"));
 			Debug.Log ("Attempting to log back with existing credentials");
-			Cloud.Login (LoginNetwork.Anonymous, info.GamerId, info.GamerSecret, true)
+			Cloud.Login (
+				network: LoginNetwork.Anonymous,
+				networkId: info.GamerId,
+				networkSecret: info.GamerSecret)
 			.Then (gamer => DidLogin(gamer))
 			.Catch (ex => {
 				Debug.LogError("Failed to log back in with stored credentials. Restarting process.");
@@ -96,6 +101,55 @@ public class Social : MonoBehaviour {
 				CotcException error = (CotcException)ex;
 				Debug.LogError ("Failed to login: " + error.ErrorCode + " (" + error.HttpStatusCode + ")");
 			});
+	}
+	#endregion
+
+	#region Public methods for access by other components
+	public string CurrentGamerId() {
+		return Gamer.GamerId;
+	}
+
+	public Promise<PagedList<Score>> FetchScores(bool centerAroundPlayer) {
+		// Offset -1 allows to center scores around player
+		// As we display only top 5, five scores at once are enough
+		return Gamer.Scores.List (
+			board: ScoreBoardName,
+			limit: centerAroundPlayer ? 1 : 5,
+			offset: centerAroundPlayer ? -1 : 0
+		);
+	}
+
+	// TODO remove
+	public void PostSampleScoresForTesting() {
+		for (int i = 0; i < 20; i++) {
+			Cloud.LoginAnonymously().Then(gamer => {
+				uint coins = (uint) (UnityEngine.Random.value * 3000);
+				uint runtime = (uint) (UnityEngine.Random.value * 100 * 60 * 10);
+				// We can add information with the field "scoreInfo", however the data size is limited so we only attach crucial information.
+				// Therefore, ghost data will be uploaded in another way.
+				return gamer.Scores.Post (
+					score: coins,
+					board: ScoreBoardName,
+					order: ScoreOrder.HighToLow,
+					scoreInfo: Bundle.CreateObject("runtime", runtime).ToJson());
+			});
+		}
+	}
+
+	public Promise<PostedGameScore> PostScore(uint coinsCollected, float runtime) {
+		// Encode runtime in seconds to a fixed point (100ths of second)
+		uint runtimeFixed = (uint) (runtime * 100);
+		// Attach additional information with the score
+		Bundle scoreInfo = Bundle.CreateObject (
+			"runtime", runtimeFixed
+		);
+		// We can add information with the field "scoreInfo", however the data size is limited so we only attach crucial information.
+		// Therefore, ghost data will be uploaded in another way.
+		return Gamer.Scores.Post (
+			score: coinsCollected,
+			board: ScoreBoardName,
+			order: ScoreOrder.HighToLow,
+			scoreInfo: scoreInfo.ToJson());
 	}
 	#endregion
 }

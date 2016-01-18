@@ -45,6 +45,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Leaderboards.cs" />
      <Compile Include="Assets\Scripts\CameraFollow.cs" />
      <Compile Include="Assets\Scripts\CotC\GamerInfo.cs" />
      <Compile Include="Assets\Scripts\CotC\Social.cs" />

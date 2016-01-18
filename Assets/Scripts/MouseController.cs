@@ -20,6 +20,7 @@ public class MouseController : MonoBehaviour {
 	private bool dead = false;
 
 	private uint coins = 0;
+	private float runtime = 0;
 
 	public Texture2D coinIconTexture;
 
@@ -30,6 +31,11 @@ public class MouseController : MonoBehaviour {
 	public AudioSource footstepsAudio;
 
 	public ParallaxScroll parallax;
+
+	public Leaderboards leaderboards;
+
+	public GameObject gameOverLayer;
+	bool gameOverHasBeenShown;
 
 	// Use this for initialization
 	void Start () {
@@ -54,6 +60,7 @@ public class MouseController : MonoBehaviour {
 		
 		if (!dead)
 		{
+			// Advance only if not grounded
 			Vector2 newVelocity = GetComponent<Rigidbody2D>().velocity;
 			newVelocity.x = forwardMovementSpeed;
 			GetComponent<Rigidbody2D>().velocity = newVelocity;
@@ -66,6 +73,9 @@ public class MouseController : MonoBehaviour {
 		AdjustFootstepsAndJetpackSound(jetpackActive);
 
 		parallax.offset = transform.position.x;
+
+		// Count the running time
+		runtime += Time.fixedDeltaTime;
 	} 
 
 	void UpdateGroundedStatus()
@@ -135,12 +145,23 @@ public class MouseController : MonoBehaviour {
 	{
 		if (dead && grounded)
 		{
-			Rect buttonRect = new Rect(Screen.width * 0.35f, Screen.height * 0.45f, Screen.width * 0.30f, Screen.height * 0.1f);
-			if (GUI.Button(buttonRect, "Tap to restart!"))
-			{
-				Application.LoadLevel (Application.loadedLevelName);
-			};
+			if (!gameOverHasBeenShown) {
+				gameOverHasBeenShown = true;
+				leaderboards.PostScoreAndUpdateLeaderboards(coins, runtime);
+				// Progressively show the canvas
+				gameOverLayer.SetActive(true);
+				StartCoroutine(ScaleGameOverLayerUp());
+			}
 		}
+	}
+
+	IEnumerator ScaleGameOverLayerUp() {
+		for (float t = 0.0f; t < 1.0f; t += Time.deltaTime * 2) {
+			float time = Mathf.Pow(t, 3);
+			gameOverLayer.transform.localScale = Vector3.Lerp(new Vector3(0, 0, 0), new Vector3(1, 1, 1), time);
+			yield return null;
+		}
+		gameOverLayer.transform.localScale = new Vector3(1, 1, 1);
 	}
 
 	void AdjustFootstepsAndJetpackSound(bool jetpackActive)    
@@ -151,4 +172,7 @@ public class MouseController : MonoBehaviour {
 		jetpackAudio.volume = jetpackActive ? 1.0f : 0.5f;        
 	}
 
+	public void RestartGame() {
+		Application.LoadLevel (Application.loadedLevelName);
+	}
 }
