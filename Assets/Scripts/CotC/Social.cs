@@ -61,7 +61,7 @@ public class Social : MonoBehaviour {
 	private void AutoRelogin() {
 		// On the first time, we need to log in anonymously, else log back with the stored credentials
 		if (!PlayerPrefs.HasKey ("GamerInfo")) {
-			MakeAnonymousAccount ();
+			MakeAnonymousAccount().Done();
 		}
 		else {
 			// Log back in
@@ -71,11 +71,11 @@ public class Social : MonoBehaviour {
 				network: LoginNetwork.Anonymous,
 				networkId: info.GamerId,
 				networkSecret: info.GamerSecret)
-			.Then (gamer => DidLogin(gamer))
 			.Catch (ex => {
 				Debug.LogError("Failed to log back in with stored credentials. Restarting process.");
-				MakeAnonymousAccount ();
-			});
+				MakeAnonymousAccount().Done();
+			})
+			.Done(gamer => DidLogin(gamer));
 		}
 	}
 
@@ -122,7 +122,7 @@ public class Social : MonoBehaviour {
 	// TODO remove
 	public void PostSampleScoresForTesting() {
 		for (int i = 0; i < 20; i++) {
-			Cloud.LoginAnonymously().Then(gamer => {
+			Cloud.LoginAnonymously().Then (gamer => {
 				uint coins = (uint) (UnityEngine.Random.value * 3000);
 				uint runtime = (uint) (UnityEngine.Random.value * 100 * 60 * 10);
 				// We can add information with the field "scoreInfo", however the data size is limited so we only attach crucial information.
@@ -132,7 +132,7 @@ public class Social : MonoBehaviour {
 					board: ScoreBoardName,
 					order: ScoreOrder.HighToLow,
 					scoreInfo: Bundle.CreateObject("runtime", runtime).ToJson());
-			});
+			}).Done ();
 		}
 	}
 

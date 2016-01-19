@@ -30,7 +30,7 @@ public class Leaderboards : MonoBehaviour {
 	}
 
 	public void PostScoreAndUpdateLeaderboards(uint coins, float runtime) {
-		Social.PostScore(coins, runtime).Then(dummy => {
+		Social.PostScore(coins, runtime).Done (dummy => {
 			YourScoreText.text = "Your score: " + coins + " (" + FormatRuntime((int) (runtime * 100)) + ")";
 			UpdateLeaderboards();
 		});
@@ -44,7 +44,8 @@ public class Leaderboards : MonoBehaviour {
 
 		// Fetch top 5
 		Social.FetchScores (centerAroundPlayer: false)
-		.Then ((PagedList<Score> topScores) => {
+		.Catch (onError)
+		.Done ((PagedList<Score> topScores) => {
 			// Generate a list of names & ranks + another for scores
 			StringBuilder rankList = new StringBuilder();
 			StringBuilder scoresList = new StringBuilder();
@@ -71,7 +72,8 @@ public class Leaderboards : MonoBehaviour {
 			// And append player's score at the bottom
 			if (!ourScoreHasBeenIncluded) {
 				Social.FetchScores (centerAroundPlayer: true)
-				.Then (playerScore => {
+				.Catch (ex => { /* We have never scored, that's ok */ })
+				.Done (playerScore => {
 					// Player has never scored here
 					if (playerScore.Count == 0) return;
 
@@ -82,11 +84,9 @@ public class Leaderboards : MonoBehaviour {
 					HighlightTextForUs(scoreText, scoresList);
 					RankNameText.text = rankList.ToString();
 					RankScoreText.text = scoresList.ToString();
-				})
-				.Catch (ex => { /* We have never scored, that's ok */ });
+				});
 			}
-		})
-		.Catch (onError);
+		});
 	}
 
 	string FormatRuntime(int runtime100thSec) {
@@ -94,6 +94,6 @@ public class Leaderboards : MonoBehaviour {
 	}
 
 	StringBuilder HighlightTextForUs(string text, StringBuilder appendTo) {
-		return appendTo.Append("<color=#a52a2a>").Append(text).Append("</color>");
+		return appendTo.Append("<color=#4adeff>").Append(text).Append("</color>");
 	}
 }
