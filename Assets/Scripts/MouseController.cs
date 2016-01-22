@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class MouseController : MonoBehaviour {
 
@@ -89,8 +90,9 @@ public class MouseController : MonoBehaviour {
 
 	void AdjustJetpack (bool jetpackActive)
 	{
-		jetpack.enableEmission = !grounded;
-		jetpack.emissionRate = jetpackActive ? 300.0f : 75.0f; 
+		var em = jetpack.emission;
+		em.enabled = !grounded;
+		em.rate = new ParticleSystem.MinMaxCurve(jetpackActive ? 300.0f : 75.0f);
 	}
 
 	void OnTriggerEnter2D(Collider2D collider)
@@ -173,6 +175,6 @@ public class MouseController : MonoBehaviour {
 	}
 
 	public void RestartGame() {
-		Application.LoadLevel (Application.loadedLevelName);
+		SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
 	}
 }
