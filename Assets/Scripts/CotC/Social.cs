@@ -105,8 +105,8 @@ public class Social : MonoBehaviour {
 	#endregion
 
 	#region Public methods for access by other components
-	public string CurrentGamerId() {
-		return Gamer.GamerId;
+	public Gamer CurrentGamer {
+		get { return Gamer; }
 	}
 
 	public Promise<PagedList<Score>> FetchScores(bool centerAroundPlayer) {

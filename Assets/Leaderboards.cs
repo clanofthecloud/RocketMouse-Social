@@ -56,7 +56,7 @@ public class Leaderboards : MonoBehaviour {
 				Bundle info = Bundle.FromJson(s.Info);
 				string scoreText = s.Value + " (" + FormatRuntime(info["runtime"]) + ")";
 				// If it's us, use a highlight color
-				if (s.GamerInfo.GamerId == Social.CurrentGamerId()) {
+				if (s.GamerInfo.GamerId == Social.CurrentGamer.GamerId) {
 					HighlightTextForUs(name, rankList).AppendLine();
 					HighlightTextForUs(scoreText, scoresList).AppendLine();
 					ourScoreHasBeenIncluded = true;
