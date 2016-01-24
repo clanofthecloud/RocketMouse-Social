@@ -2,9 +2,12 @@
 using System;
 using System.Collections;
 using CotcSdk;
+using CotcSdk.FacebookIntegration;
+using System.Collections.Generic;
 
 public class Social : MonoBehaviour {
 
+	public ConfirmationDialog ConfirmationDialog;
 	// The cloud allows to make generic operations (non user related)
 	private Cloud Cloud;
 	// The gamer is the base to perform most operations. A gamer object is obtained after successfully signing in.
@@ -13,6 +16,8 @@ public class Social : MonoBehaviour {
 	private DomainEventLoop Loop;
 	// Leaderboards for score (max. number of collected coins) are stored under this name on the server.
 	private static string ScoreBoardName = "scores";
+	private bool ShouldBringFbLoginDialog = false;
+	private Promise<Facebook.Unity.AccessToken> AfterFbLoginDialog;
 
 	// Use this for initialization
 	void Start () {
@@ -42,8 +47,22 @@ public class Social : MonoBehaviour {
 //			PostSampleScoresForTesting();
 			InitCloud();
 		});
+
+		Debug.Assert(ConfirmationDialog != null);
 	}
-	
+
+	void OnGUI() {
+		// Because of facebook implementation, we need to differ operations to the OnGUI. This is enabled by setting ShouldBringFbLoginDialog to true. When done we'll forward the result to AfterFbLoginDialog.
+		if (ShouldBringFbLoginDialog) {
+			var fb = FindObjectOfType<CotcFacebookIntegration>();
+			ShouldBringFbLoginDialog = false;
+			if (fb == null) {
+				throw new UnityException("Please put the CotcFacebookIntegration prefab in your scene!");
+			}
+			fb.LoginToFacebook(new List<string>() { "public_profile","email","user_friends" }).ForwardTo(AfterFbLoginDialog);
+		}
+	}
+
 	// Update is called once per frame
 	void Update () {
 	
@@ -107,6 +126,47 @@ public class Social : MonoBehaviour {
 	#region Public methods for access by other components
 	public Gamer CurrentGamer {
 		get { return Gamer; }
+	}
+
+	public Promise<Done> ConvertAccountToFb() {
+		var promise = new Promise<Done>();
+		// Will be done in the next OnGUI call.
+		ShouldBringFbLoginDialog = true;
+		AfterFbLoginDialog = new Promise<Facebook.Unity.AccessToken>();
+
+		AfterFbLoginDialog
+		.Catch(ex => promise.Reject(ex))
+		.Done(token => {
+			// We got a token from facebook -> try to convert the account
+			Gamer.Account.Convert(LoginNetwork.Facebook, token.UserId, token.TokenString)
+			.Catch(ex => {
+				// We might get an error from CotC telling that the account already exists. In this case the progress made with this anonymous account would have to be dropped. We need to warn the user.
+				CotcException e = ex as CotcException;
+				if (e != null && e.ServerData["message"] == "UserExists") {
+					ConfirmationDialog.Show("Confirm", "You already have an account associated to this facebook ID. If you switch to it, you will lose the current progress.\nAre you sure?").Then(result => {
+						if (result == 1) { // OK
+							// So we'll just switch to this account
+							Cloud.Login(LoginNetwork.Facebook, token.UserId, token.TokenString)
+							.Catch(loginFailure => promise.Reject(loginFailure))
+							.Done(gamer => {
+								DidLogin(gamer);
+								promise.Resolve(new Done(true, null));
+							});
+						}
+						else {
+							promise.Reject(new UnityException("User refused"));
+						}
+					});
+				}
+				else {
+					promise.Reject(ex);
+				}
+			}).Done(conversionResult => {
+				// Converted successfully
+				promise.Resolve(new Done(true, null));
+			});
+		});
+		return promise;
 	}
 
 	public Promise<PagedList<Score>> FetchScores(bool centerAroundPlayer) {

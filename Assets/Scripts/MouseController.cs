@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class MouseController : MonoBehaviour {
 
@@ -35,11 +36,14 @@ public class MouseController : MonoBehaviour {
 
 	public Leaderboards leaderboards;
 
-	public GameObject gameOverLayer;
+	public GameObject gameOverLayer, editProfileLayer;
+	public Text coinText;
 	bool gameOverHasBeenShown;
 
 	// Use this for initialization
 	void Start () {
+		Screen.autorotateToPortrait = false;
+		Screen.autorotateToPortraitUpsideDown = false;
 		animator = GetComponent<Animator>();	
 	}
 	
@@ -131,16 +135,7 @@ public class MouseController : MonoBehaviour {
 
 	void DisplayCoinsCount()
 	{
-		Rect coinIconRect = new Rect(10, 10, 32, 32);
-		GUI.DrawTexture(coinIconRect, coinIconTexture);                         
-		
-		GUIStyle style = new GUIStyle();
-		style.fontSize = 30;
-		style.fontStyle = FontStyle.Bold;
-		style.normal.textColor = Color.yellow;
-		
-		Rect labelRect = new Rect(coinIconRect.xMax, coinIconRect.y, 60, 32);
-		GUI.Label(labelRect, coins.ToString(), style);
+		coinText.text = "x" + coins;
 	}
 
 	void DisplayRestartButton()
@@ -151,19 +146,9 @@ public class MouseController : MonoBehaviour {
 				gameOverHasBeenShown = true;
 				leaderboards.PostScoreAndUpdateLeaderboards(coins, runtime);
 				// Progressively show the canvas
-				gameOverLayer.SetActive(true);
-				StartCoroutine(ScaleGameOverLayerUp());
+				StartCoroutine(Various.ScaleLayerUp(gameOverLayer, 0.5f));
 			}
 		}
-	}
-
-	IEnumerator ScaleGameOverLayerUp() {
-		for (float t = 0.0f; t < 1.0f; t += Time.deltaTime * 2) {
-			float time = Mathf.Pow(t, 3);
-			gameOverLayer.transform.localScale = Vector3.Lerp(new Vector3(0, 0, 0), new Vector3(1, 1, 1), time);
-			yield return null;
-		}
-		gameOverLayer.transform.localScale = new Vector3(1, 1, 1);
 	}
 
 	void AdjustFootstepsAndJetpackSound(bool jetpackActive)    
@@ -176,5 +161,9 @@ public class MouseController : MonoBehaviour {
 
 	public void RestartGame() {
 		SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+	}
+
+	public void ShowProfileDialog() {
+		StartCoroutine(Various.ScaleLayerUp(editProfileLayer, 0.3f));
 	}
 }

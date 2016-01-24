@@ -1,6 +1,5 @@
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2008
-
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{B93AFD4E-BECB-2927-EA39-FDBE778D0C5A}") = "RocketMouse_Final", "Assembly-CSharp.csproj", "{710F6D94-9802-C837-D4A6-B12D6D4AC332}"
 EndProject
 Global
@@ -13,9 +12,6 @@ Global
 		{710F6D94-9802-C837-D4A6-B12D6D4AC332}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{710F6D94-9802-C837-D4A6-B12D6D4AC332}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{710F6D94-9802-C837-D4A6-B12D6D4AC332}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Assembly-CSharp.csproj
