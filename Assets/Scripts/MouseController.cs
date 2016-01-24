@@ -7,7 +7,8 @@ public class MouseController : MonoBehaviour {
 
 	public float jetpackForce = 75.0f;
 
-	public float forwardMovementSpeed = 3.0f;
+	public float initialForwardMovementSpeed = 2.5f;
+	public float incrementForwardMovementSpeedPerSecond = 0.04f;
 
 	public Transform groundCheckTransform;
 	
@@ -38,13 +39,15 @@ public class MouseController : MonoBehaviour {
 
 	public GameObject gameOverLayer, editProfileLayer;
 	public Text coinText;
-	bool gameOverHasBeenShown;
+	private bool gameOverHasBeenShown;
+	private float forwardMovementSpeed;
 
 	// Use this for initialization
 	void Start () {
 		Screen.autorotateToPortrait = false;
 		Screen.autorotateToPortraitUpsideDown = false;
 		animator = GetComponent<Animator>();	
+		forwardMovementSpeed = initialForwardMovementSpeed;
 	}
 	
 	// Update is called once per frame
@@ -78,6 +81,8 @@ public class MouseController : MonoBehaviour {
 		AdjustFootstepsAndJetpackSound(jetpackActive);
 
 		parallax.offset = transform.position.x;
+
+		forwardMovementSpeed += Time.fixedDeltaTime * incrementForwardMovementSpeedPerSecond;
 
 		// Count the running time
 		runtime += Time.fixedDeltaTime;

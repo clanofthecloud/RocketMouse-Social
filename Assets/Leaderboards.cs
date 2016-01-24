@@ -7,26 +7,25 @@ using System.Text;
 
 public class Leaderboards : MonoBehaviour {
 
-	// Set this to true in the inspector in order to fetch the leaderboards automatically upon instantiation.
-	// Unless this is set to true, you need to call UpdateLeaderboards at least once
-	public bool AutoFetch;
 	public Text RankNameText, RankScoreText, YourScoreText;
 	// Used to perform social functions
 	public Social Social;
+	// Needs update if the player logs in/out
+	private Gamer LastGamer;
 
 	// Use this for initialization
 	void Start () {
 		RankNameText.text = "";
 		RankScoreText.text = "";
 		YourScoreText.text = "";
-		if (AutoFetch) {
-			UpdateLeaderboards();
-		}
 	}
 	
 	// Update is called once per frame
 	void Update () {
-	
+		if (LastGamer != Social.CurrentGamer) {
+			UpdateLeaderboards();
+			LastGamer = Social.CurrentGamer;
+		}
 	}
 
 	public void PostScoreAndUpdateLeaderboards(uint coins, float runtime) {

@@ -11,14 +11,12 @@ public class ProfileDialogBox : MonoBehaviour {
 	public InputField NameField;
 	public Button ConnectFacebookButton;
 	private Gamer LastGamer;
-	public ConfirmationDialog ConfirmationDialog;
 
 	// Use this for initialization
 	void Start () {
 		Debug.Assert(Social != null);
 		Debug.Assert(NameField != null);
 		Debug.Assert(ConnectFacebookButton != null);
-		Debug.Assert(ConfirmationDialog != null);
 	}
 	
 	// Update is called once per frame

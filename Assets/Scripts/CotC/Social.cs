@@ -31,6 +31,7 @@ public class Social : MonoBehaviour {
 			Debug.LogError("Unhandled exception: " + e.Exception.ToString());
 		};
 //		Promise.Debug_OutputAllExceptions = true;
+//		PlayerPrefs.DeleteAll();
 
 		// Initiate getting the main Cloud object
 		cotc.GetCloud().Done(cloud => {
@@ -163,7 +164,9 @@ public class Social : MonoBehaviour {
 				}
 			}).Done(conversionResult => {
 				// Converted successfully
-				promise.Resolve(new Done(true, null));
+				AutoRelogin();
+				ConfirmationDialog.Show("Conversion done", "Your account was successfully converted and now uses facebook credentials!", false)
+					.Done(result => promise.Resolve(new Done(true, null)));
 			});
 		});
 		return promise;
