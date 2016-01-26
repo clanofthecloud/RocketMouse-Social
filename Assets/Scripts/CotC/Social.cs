@@ -18,6 +18,7 @@ public class Social : MonoBehaviour {
 	private static string ScoreBoardName = "scores";
 	private bool ShouldBringFbLoginDialog = false;
 	private Promise<Facebook.Unity.AccessToken> AfterFbLoginDialog;
+	public EventHandler GamerChanged;
 
 	// Use this for initialization
 	void Start () {
@@ -111,6 +112,8 @@ public class Social : MonoBehaviour {
 		Debug.Log("Signed in successfully (ID = " + Gamer.GamerId + ")");
 		// Keep login in persistent memory to restore next time
 		PlayerPrefs.SetString("GamerInfo", new GamerInfo(Gamer).ToJson());
+		// Notify others
+		if (GamerChanged != null) GamerChanged(this, new EventArgs());
 	}
 
 	private Promise<Gamer> MakeAnonymousAccount() {
@@ -164,7 +167,7 @@ public class Social : MonoBehaviour {
 				}
 			}).Done(conversionResult => {
 				// Converted successfully
-				AutoRelogin();
+				if (GamerChanged != null) GamerChanged(this, new EventArgs());
 				ConfirmationDialog.Show("Conversion done", "Your account was successfully converted and now uses facebook credentials!", false)
 					.Done(result => promise.Resolve(new Done(true, null)));
 			});

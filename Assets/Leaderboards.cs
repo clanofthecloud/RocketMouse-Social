@@ -18,14 +18,19 @@ public class Leaderboards : MonoBehaviour {
 		RankNameText.text = "";
 		RankScoreText.text = "";
 		YourScoreText.text = "";
+		Social.GamerChanged += Social_GamerChanged;
 	}
 	
 	// Update is called once per frame
-	void Update () {
-		if (LastGamer != Social.CurrentGamer) {
-			UpdateLeaderboards();
-			LastGamer = Social.CurrentGamer;
-		}
+	void Update () {}
+
+	void Destroy() {
+		Social.GamerChanged -= Social_GamerChanged;
+	}
+
+	void Social_GamerChanged(object sender, EventArgs e) {
+		// Update the UI whenever the logged in gamer changes
+		UpdateLeaderboards();
 	}
 
 	public void PostScoreAndUpdateLeaderboards(uint coins, float runtime) {
