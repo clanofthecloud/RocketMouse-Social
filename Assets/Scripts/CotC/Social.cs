@@ -16,8 +16,6 @@ public class Social : MonoBehaviour {
 	private DomainEventLoop Loop;
 	// Leaderboards for score (max. number of collected coins) are stored under this name on the server.
 	private static string ScoreBoardName = "scores";
-	private bool ShouldBringFbLoginDialog = false;
-	private Promise<Facebook.Unity.AccessToken> AfterFbLoginDialog;
 	public EventHandler GamerChanged;
 
 	// Use this for initialization
@@ -51,18 +49,6 @@ public class Social : MonoBehaviour {
 		});
 
 		Debug.Assert(ConfirmationDialog != null);
-	}
-
-	void OnGUI() {
-		// Because of facebook implementation, we need to differ operations to the OnGUI. This is enabled by setting ShouldBringFbLoginDialog to true. When done we'll forward the result to AfterFbLoginDialog.
-		if (ShouldBringFbLoginDialog) {
-			var fb = FindObjectOfType<CotcFacebookIntegration>();
-			ShouldBringFbLoginDialog = false;
-			if (fb == null) {
-				throw new UnityException("Please put the CotcFacebookIntegration prefab in your scene!");
-			}
-			fb.LoginToFacebook(new List<string>() { "public_profile","email","user_friends" }).ForwardTo(AfterFbLoginDialog);
-		}
 	}
 
 	// Update is called once per frame
@@ -134,11 +120,12 @@ public class Social : MonoBehaviour {
 
 	public Promise<Done> ConvertAccountToFb() {
 		var promise = new Promise<Done>();
-		// Will be done in the next OnGUI call.
-		ShouldBringFbLoginDialog = true;
-		AfterFbLoginDialog = new Promise<Facebook.Unity.AccessToken>();
+		var fb = FindObjectOfType<CotcFacebookIntegration>();
+		if (fb == null) {
+			throw new UnityException("Please put the CotcFacebookIntegration prefab in your scene!");
+		}
 
-		AfterFbLoginDialog
+		fb.LoginToFacebook(new List<string>() { "public_profile","email","user_friends" })
 		.Catch(ex => promise.Reject(ex))
 		.Done(token => {
 			// We got a token from facebook -> try to convert the account
@@ -216,6 +203,25 @@ public class Social : MonoBehaviour {
 			board: ScoreBoardName,
 			order: ScoreOrder.HighToLow,
 			scoreInfo: scoreInfo.ToJson());
+	}
+
+	public void ShareBestScoreOnInternet(uint coinsCollected, float runtime) {
+		var fb = FindObjectOfType<CotcFacebookIntegration>();
+		if (fb == null) {
+			throw new UnityException("Please put the CotcFacebookIntegration prefab in your scene!");
+		}
+
+		fb.ShareLink(
+			url: "https://github.com/clanofthecloud/RocketMouse-Social",
+			title: "I made a best score in RocketMouse!",
+			description: "I just collected " + coinsCollected + " coins, in " + Various.FormatRuntime((int) (runtime * 100)) + "!",
+			photoUrl: "http://cdn3.raywenderlich.com/wp-content/uploads/2014/06/rocket_mouse_fly.png")
+		.Catch(ex => {
+			ConfirmationDialog.Show("Error", "The story was NOT published on your facebook account: " + ex.ToString(), false);
+		})
+		.Done(result => {
+			ConfirmationDialog.Show("Story shared", "The story was published on your facebook account", false);
+		});
 	}
 	#endregion
 }

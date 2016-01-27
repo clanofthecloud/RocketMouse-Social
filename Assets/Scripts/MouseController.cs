@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using CotcSdk;
 
 public class MouseController : MonoBehaviour {
 
@@ -36,6 +37,7 @@ public class MouseController : MonoBehaviour {
 	public ParallaxScroll parallax;
 
 	public Leaderboards leaderboards;
+	public Social social;
 
 	public GameObject gameOverLayer, editProfileLayer;
 	public Text coinText;
@@ -48,6 +50,7 @@ public class MouseController : MonoBehaviour {
 		Screen.autorotateToPortraitUpsideDown = false;
 		animator = GetComponent<Animator>();	
 		forwardMovementSpeed = initialForwardMovementSpeed;
+		Debug.Assert(social != null && leaderboards != null);
 	}
 	
 	// Update is called once per frame
@@ -170,5 +173,9 @@ public class MouseController : MonoBehaviour {
 
 	public void ShowProfileDialog() {
 		StartCoroutine(Various.ScaleLayerUp(editProfileLayer, 0.3f));
+	}
+
+	public void ShareScore() {
+		social.ShareBestScoreOnInternet(coins, runtime);
 	}
 }

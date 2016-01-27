@@ -8,7 +8,6 @@ public class ConfirmationDialog : MonoBehaviour {
 	public GameObject ContentsGameObject;
 	public Button OkButton, CancelButton;
 	public Text TitleText, MessageText;
-	RawImage Backdrop;
 	Promise<int> CurrentPromise;
 
 	// Use this for initialization
@@ -18,7 +17,6 @@ public class ConfirmationDialog : MonoBehaviour {
 		Debug.Assert(TitleText != null && MessageText != null);
 
 		this.gameObject.SetActive(false);
-		Backdrop = GetComponent<RawImage>();
 		OkButton.onClick.AddListener(() => {
 			HideWithResult(1);
 		});
@@ -34,8 +32,7 @@ public class ConfirmationDialog : MonoBehaviour {
 
 	void HideWithResult(int result) {
 		var prom = CurrentPromise;
-		StartCoroutine(Various.ScaleLayerDown(ContentsGameObject, AnimationDuration,
-			() => Backdrop.gameObject.SetActive(false)));
+		StartCoroutine(Various.ScaleLayerDown(ContentsGameObject, AnimationDuration, () => this.gameObject.SetActive(false)));
 		CurrentPromise = null;
 		prom.PostResult(result);
 	}
@@ -48,11 +45,10 @@ public class ConfirmationDialog : MonoBehaviour {
 		}
 
 		CurrentPromise = new Promise<int>();
+		this.gameObject.SetActive(true);
 		TitleText.text = title;
 		MessageText.text = text;
 		CancelButton.gameObject.SetActive(withCancelButton);
-		Backdrop.gameObject.SetActive(true);
-		gameObject.SetActive(true);
 		StartCoroutine(Various.ScaleLayerUp(ContentsGameObject, AnimationDuration));
 		return CurrentPromise;
 	}

@@ -4,6 +4,9 @@ using UnityEngine;
 
 public static class Various
 {
+	public static string FormatRuntime(int runtime100thSec) {
+		return string.Format("{0}:{1:00}", runtime100thSec / 60 / 100, (runtime100thSec / 100) % 60);
+	}
 
 	public static IEnumerator ScaleLayerDown(GameObject layer, float totalTime, Action onFinished = null) {
 		var speed = 1 / totalTime;

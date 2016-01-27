@@ -8,6 +8,7 @@ using System.Text;
 public class Leaderboards : MonoBehaviour {
 
 	public Text RankNameText, RankScoreText, YourScoreText;
+	public Button ShareButton;
 	// Used to perform social functions
 	public Social Social;
 	// Needs update if the player logs in/out
@@ -35,7 +36,7 @@ public class Leaderboards : MonoBehaviour {
 
 	public void PostScoreAndUpdateLeaderboards(uint coins, float runtime) {
 		Social.PostScore(coins, runtime).Done (dummy => {
-			YourScoreText.text = "Your score: " + coins + " (" + FormatRuntime((int) (runtime * 100)) + ")";
+			YourScoreText.text = "Your score: " + coins + " (" + Various.FormatRuntime((int) (runtime * 100)) + ")";
 			UpdateLeaderboards();
 		});
 	}
@@ -45,6 +46,9 @@ public class Leaderboards : MonoBehaviour {
 			Debug.LogError("Failed to fetch score list: " + ex.ToString());
 			RankNameText.text = "Network error\nPlease check your connectivity.";
 		};
+
+		// Enable the sharing button only if we're logged in through facebook
+		ShareButton.gameObject.SetActive(Social.CurrentGamer.Network == LoginNetwork.Facebook);
 
 		// Fetch top 5
 		Social.FetchScores (centerAroundPlayer: false)
@@ -58,7 +62,7 @@ public class Leaderboards : MonoBehaviour {
 			foreach (Score s in topScores) {
 				string name = s.GamerInfo["profile"]["displayName"] + " (#" + (rank++) + ")";
 				Bundle info = Bundle.FromJson(s.Info);
-				string scoreText = s.Value + " (" + FormatRuntime(info["runtime"]) + ")";
+				string scoreText = s.Value + " (" + Various.FormatRuntime(info["runtime"]) + ")";
 				// If it's us, use a highlight color
 				if (s.GamerInfo.GamerId == Social.CurrentGamer.GamerId) {
 					HighlightTextForUs(name, rankList).AppendLine();
@@ -83,7 +87,7 @@ public class Leaderboards : MonoBehaviour {
 
 					string name = playerScore[0].GamerInfo["profile"]["displayName"] + " (#" + playerScore[0].Rank + ")";
 					Bundle info = Bundle.FromJson(playerScore[0].Info);
-					string scoreText = playerScore[0].Value + " (" + FormatRuntime(info["runtime"]) + ")";
+					string scoreText = playerScore[0].Value + " (" + Various.FormatRuntime(info["runtime"]) + ")";
 					HighlightTextForUs(name, rankList);
 					HighlightTextForUs(scoreText, scoresList);
 					RankNameText.text = rankList.ToString();
@@ -91,10 +95,6 @@ public class Leaderboards : MonoBehaviour {
 				});
 			}
 		});
-	}
-
-	string FormatRuntime(int runtime100thSec) {
-		return string.Format("{0}:{1:00}", runtime100thSec / 60 / 100, (runtime100thSec / 100) % 60);
 	}
 
 	StringBuilder HighlightTextForUs(string text, StringBuilder appendTo) {
