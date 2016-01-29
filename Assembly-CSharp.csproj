@@ -47,6 +47,19 @@
   <ItemGroup>
      <Compile Include="Assets\ConfirmationDialog.cs" />
      <Compile Include="Assets\Cotc.FacebookIntegration\Scripts\CotcFacebookIntegration.cs" />
+     <Compile Include="Assets\FacebookSDK\Examples\Scripts\ConsoleBase.cs" />
+     <Compile Include="Assets\FacebookSDK\Examples\Scripts\LogView.cs" />
+     <Compile Include="Assets\FacebookSDK\Examples\Scripts\MenuBase.cs" />
+     <Compile Include="Assets\FacebookSDK\Examples\Scripts\SubMenus\AccessTokenMenu.cs" />
+     <Compile Include="Assets\FacebookSDK\Examples\Scripts\SubMenus\AppEvents.cs" />
+     <Compile Include="Assets\FacebookSDK\Examples\Scripts\SubMenus\AppInvites.cs" />
+     <Compile Include="Assets\FacebookSDK\Examples\Scripts\SubMenus\AppLinks.cs" />
+     <Compile Include="Assets\FacebookSDK\Examples\Scripts\SubMenus\AppRequests.cs" />
+     <Compile Include="Assets\FacebookSDK\Examples\Scripts\SubMenus\DialogShare.cs" />
+     <Compile Include="Assets\FacebookSDK\Examples\Scripts\SubMenus\GameGroups.cs" />
+     <Compile Include="Assets\FacebookSDK\Examples\Scripts\SubMenus\GraphRequest.cs" />
+     <Compile Include="Assets\FacebookSDK\Examples\Scripts\SubMenus\MainMenu.cs" />
+     <Compile Include="Assets\FacebookSDK\Examples\Scripts\SubMenus\Pay.cs" />
      <Compile Include="Assets\FacebookSDK\SDK\Scripts\AccessToken.cs" />
      <Compile Include="Assets\FacebookSDK\SDK\Scripts\AppEventName.cs" />
      <Compile Include="Assets\FacebookSDK\SDK\Scripts\AppEventParameterName.cs" />
@@ -148,7 +161,7 @@
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
  </Reference>
  <Reference Include="CotcSdk">
- <HintPath>/Users/florian/Documents/CotC/Github-projects/RocketMouse-Social/Assets/Plugins/CotcSdk.dll</HintPath>
+ <HintPath>/Users/florian/Documents/CotC/Github-projects/RocketMouse-Social/Assets/Cotc/Plugins/CotcSdk.dll</HintPath>
  </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

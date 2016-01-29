@@ -217,10 +217,10 @@ public class Social : MonoBehaviour {
 			description: "I just collected " + coinsCollected + " coins, in " + Various.FormatRuntime((int) (runtime * 100)) + "!",
 			photoUrl: "http://cdn3.raywenderlich.com/wp-content/uploads/2014/06/rocket_mouse_fly.png")
 		.Catch(ex => {
-			ConfirmationDialog.Show("Error", "The story was NOT published on your facebook account: " + ex.ToString(), false);
+			ConfirmationDialog.Show("Error", "The score could not be published on your facebook account: " + ex.ToString(), false);
 		})
 		.Done(result => {
-			ConfirmationDialog.Show("Story shared", "The story was published on your facebook account", false);
+			ConfirmationDialog.Show("Score published", "Thank you for sharing how awesome you are!", false);
 		});
 	}
 	#endregion
